@@ -1,7 +1,5 @@
 // TODO: インデントの整理
 
-
-
 const COLUMNS= 12;
 const ROWS = 21;
 const FALL_TIME = 100;
@@ -12,12 +10,12 @@ let cells;
 let isFallingFlag = true;
 
 //現在位置のタグを入手
-let getTag = function( x, y ) {
+const getTag = ( x, y ) => {
     return cells[x][y];
 }
 
 
-let blocks = {
+const blocks = {
     i: {
         class: "i",
         pattern: [
@@ -106,7 +104,7 @@ let blocks = {
 
 }
 
-let Stage = function() {
+const Stage = function() {
 
     this.makeStage = function() {
         let table = "";
@@ -145,7 +143,7 @@ let Stage = function() {
 }
 
 
-let Block = function() {
+const Block = function() {
     this.keys = Object.keys(blocks);
     this.position = {x: START_X_POSITION, y: START_Y_POSITION};
     this.blockType = 0;

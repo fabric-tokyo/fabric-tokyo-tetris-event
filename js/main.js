@@ -193,18 +193,25 @@ const Block = function() {
       return false;
    };
 
-   // 消去
-   this.erase = function( y ) {
+   // 消去判定
+   this.judgeErase = function( y ) {
        let count = 0;
         for(let col = 0; col < COLUMNS - 1; col++){
             if( getTag(y, col).classList.contains('inactive')){
                 count++
             }
-            console.log(count);
-            if(count == COLUMNS - 1) {
-                console.log('消える');
-                // getTag(y.col).remove();
-            }
+            this.erase(count, y, col);
+        }
+        console.log(count);
+    }
+
+    // 消去
+    this.erase = function(count, y, col) {
+        if(count == COLUMNS - 1) {
+          for(let col =0; col < COLUMNS -1; col++) {
+              let removeBlock = getTag(y, col).parentElement;
+              removeBlock.parentElement.removeChild(removeBlock);
+          }
         }
     }
 
@@ -244,7 +251,7 @@ const Block = function() {
                if (this.block[row][col]) {
                      getTag(row +this.position.y, col+this.position.x).classList.add(this.class, 'inactive');
                      isFallingFlag = false;
-                     this.erase(row + this.position.y);
+                     this.judgeErase(row + this.position.y);
                }
             }
         }

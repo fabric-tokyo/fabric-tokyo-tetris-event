@@ -241,13 +241,13 @@ const Block = function() {
     this.class = "";
     this.angle = 0;
 
-   this.initialize = function() {
+    this.initialize = function() {
       this.position = {x: START_X_POSITION, y: START_Y_POSITION};
       this.blockType = this.keys[Math.floor( Math.random() * (this.keys.length))];
       this.blockPatterns = blocks[this.blockType];
       this.class = this.blockPatterns.class
       this.block = this.blockPatterns.pattern[this.angle];
-   }
+    }
 
     //ブロックを生成
     this.generate = function() {
@@ -320,6 +320,9 @@ const Block = function() {
     this.clear = function() {
         for (let row = 0; row < BLOCK_SIZE; row++) {
             for (let col = 0; col < BLOCK_SIZE; col++) {
+                if(col + this.position.x + 1 > COLUMNS){
+                  continue;
+                }
                 if(!getTag(row + this.position.y, col + this.position.x).classList.contains('inactive', this.class)){
                     getTag(row + this.position.y, col + this.position.x).classList.remove(this.class);
                 }
@@ -353,7 +356,7 @@ const Block = function() {
 
 // TODO: 左右の処理が冗長なので、まとめる
     // 左スライド
-    this.moveLeft = function(left) {
+    this.moveLeft = function() {
         if(this.judgeLeft()){
             this.clear();
             this.position.x--;
@@ -362,7 +365,7 @@ const Block = function() {
     }
 
     // 右スライド
-    this.moveRight = function(right) {
+    this.moveRight = function() {
         if(this.judgeRight()){
             this.clear();
             this.position.x++;
@@ -371,7 +374,7 @@ const Block = function() {
     }
 
     // 右方向ぶつかり判定
-    this.judgeRight = function(right) {
+    this.judgeRight = function() {
         for (let row = 0; row < BLOCK_SIZE; row++) {
             for (let col = 0; col < BLOCK_SIZE; col++) {
                   if( this.block[row][col] == 1 && getTag(row + this.position.y, col + this.position.x + 1).classList.contains('inactive')) {
@@ -395,6 +398,9 @@ const Block = function() {
     }
 
     // 回転処理
+    this.rotate = function() {
+        this.clear();
+    }
 }
 
 // let gameOverDisplay = function(){
@@ -443,16 +449,17 @@ document.addEventListener('DOMContentLoaded',
          document.onkeydown = function(e) {
              switch(e.code) {
                  case "ArrowRight":
-                     console.log('右');
                      block.moveRight(true);
                      break;
                  case "ArrowLeft":
-                     console.log('左');
                      block.moveLeft(false);
                      break;
                  case "ArrowDown":
-                     console.log('下');
                      block.down();
+                case "KeyF":
+                    block.rotate();
+                case "KeyA":
+                    block.rotate();
              }
          }
     }

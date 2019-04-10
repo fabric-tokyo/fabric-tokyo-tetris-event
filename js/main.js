@@ -54,6 +54,24 @@ const blocks = {
                 [0, 1, 1, 0],
                 [0, 0, 0, 0],
                 [0, 0, 0, 0],
+            ],
+            [
+                [0, 1, 1, 0],
+                [0, 1, 1, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+            ],
+            [
+                [0, 1, 1, 0],
+                [0, 1, 1, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+            ],
+            [
+                [0, 1, 1, 0],
+                [0, 1, 1, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
             ]
         ]
     },
@@ -64,6 +82,24 @@ const blocks = {
                 [0, 1, 0, 0],
                 [1, 1, 1, 0],
                 [0, 0, 0, 0],
+                [0, 0, 0, 0]
+            ],
+            [
+                [0, 1, 0, 0],
+                [1, 1, 0, 0],
+                [0, 1, 0, 0],
+                [0, 0, 0, 0]
+            ],
+            [
+                [0, 0, 0, 0],
+                [1, 1, 1, 0],
+                [0, 1, 0, 0],
+                [0, 0, 0, 0]
+            ],
+            [
+                [0, 1, 0, 0],
+                [0, 1, 1, 0],
+                [0, 1, 0, 0],
                 [0, 0, 0, 0]
             ]
         ]
@@ -76,6 +112,24 @@ const blocks = {
                 [0, 1, 1, 0],
                 [0, 0, 0, 0],
                 [0, 0, 0, 0]
+            ],
+            [
+                [0, 1, 0, 0],
+                [1, 1, 0, 0],
+                [1, 0, 0, 0],
+                [0, 0, 0, 0]
+            ],
+            [
+                [0, 0, 0, 0],
+                [1, 1, 0, 0],
+                [0, 1, 1, 0],
+                [0, 0, 0, 0]
+            ],
+            [
+                [0, 1, 0, 0],
+                [1, 1, 0, 0],
+                [1, 0, 0, 0],
+                [0, 0, 0, 0]
             ]
         ]
     },
@@ -86,6 +140,24 @@ const blocks = {
                 [0, 0, 1, 0],
                 [1, 1, 1, 0],
                 [0, 0, 0, 0],
+                [0, 0, 0, 0]
+            ],
+            [
+                [1, 1, 0, 0],
+                [0, 1, 0, 0],
+                [0, 1, 0, 0],
+                [0, 0, 0, 0]
+            ],
+            [
+                [0, 0, 0, 0],
+                [1, 1, 1, 0],
+                [1, 0, 0, 0],
+                [0, 0, 0, 0]
+            ],
+            [
+                [0, 1, 0, 0],
+                [0, 1, 0, 0],
+                [0, 1, 1, 0],
                 [0, 0, 0, 0]
             ]
         ]
@@ -98,7 +170,25 @@ const blocks = {
                 [1, 1, 1, 0],
                 [0, 0, 0, 0],
                 [0, 0, 0, 0]
-            ]
+            ],
+            [
+                [0, 1, 0, 0],
+                [0, 1, 0, 0],
+                [1, 1, 0, 0],
+                [0, 0, 0, 0]
+            ],
+            [
+                [0, 0, 0, 0],
+                [1, 1, 1, 0],
+                [0, 0, 1, 0],
+                [0, 0, 0, 0]
+            ],
+            [
+                [0, 1, 1, 0],
+                [0, 1, 0, 0],
+                [0, 1, 0, 0],
+                [0, 0, 0, 0]
+            ],
         ]
     }
 
@@ -153,7 +243,7 @@ const Block = function() {
 
    this.initialize = function() {
       this.position = {x: START_X_POSITION, y: START_Y_POSITION};
-      this.blockType = this.keys[1 + Math.floor( Math.random() * (this.keys.length -1))];
+      this.blockType = this.keys[Math.floor( Math.random() * (this.keys.length))];
       this.blockPatterns = blocks[this.blockType];
       this.class = this.blockPatterns.class
       this.block = this.blockPatterns.pattern[this.angle];
@@ -212,7 +302,7 @@ const Block = function() {
       }
       //一段下げる
       for( let downRow = globalY - 1; downRow > 0 ; downRow--) {
-        for( let col = 0; col < COLUMNS - 1; col ++) {
+        for( let col = 1; col < COLUMNS - 1; col ++) {
           getTag(downRow + 1, col).className = getTag(downRow, col).className;
           getTag(downRow, col).className = "";
         }
@@ -303,6 +393,8 @@ const Block = function() {
         }
         return true;
     }
+
+    // 回転処理
 }
 
 // let gameOverDisplay = function(){

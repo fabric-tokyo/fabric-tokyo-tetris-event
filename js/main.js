@@ -116,7 +116,7 @@ const Stage = function() {
             table = table + '</tr>';
         }
         return table;
-    };
+    }
 
     this.loadStage = function() {
         cells = [];
@@ -129,7 +129,7 @@ const Stage = function() {
                 index++;
             }
         }
-    };
+    }
 
     this.makeWall = function() {
         for (let col = 0; col < COLUMNS; col++) {
@@ -141,7 +141,6 @@ const Stage = function() {
         }
     }
 }
-
 
 const Block = function() {
     this.keys = Object.keys(blocks);
@@ -169,7 +168,7 @@ const Block = function() {
                 }
             }
         }
-    };
+    }
 
     //下方向判定
     this.judgeFall = function() {
@@ -181,7 +180,7 @@ const Block = function() {
             }
         }
         return true;
-    };
+    }
 
     // ゲームオーバー判定
     this.judgeGameOver = function() {
@@ -191,28 +190,33 @@ const Block = function() {
          }
       }
       return false;
-   };
+   }
 
    // 消去判定
-   this.judgeErase = function( y ) {
+   this.judgeErase = function( globalY ) {
        let count = 0;
         for(let col = 0; col < COLUMNS - 1; col++){
-            if( getTag(y, col).classList.contains('inactive')){
+            if( getTag(globalY, col).classList.contains('inactive')){
                 count++
             }
-            this.erase(count, y, col);
+            if(count == COLUMNS -1) {
+              this.erase(globalY);
+            }
         }
-        console.log(count);
     }
 
     // 消去
-    this.erase = function(count, y, col) {
-        if(count == COLUMNS - 1) {
-          for(let col =0; col < COLUMNS -1; col++) {
-              let removeBlock = getTag(y, col).parentElement;
-              removeBlock.parentElement.removeChild(removeBlock);
-          }
+    this.erase = function(globalY) {
+      for(let col =1; col < COLUMNS - 1; col++) {
+        getTag(globalY, col).className = "";
+      }
+      //一段下げる
+      for( let downRow = globalY - 1; downRow > 0 ; downRow--) {
+        for( let col = 0; col < COLUMNS - 1; col ++) {
+          getTag(downRow + 1, col).className = getTag(downRow, col).className;
+          getTag(downRow, col).className = "";
         }
+      }
     }
 
    // 落下処理
@@ -220,7 +224,7 @@ const Block = function() {
         this.clear();
         this.position.y++;
         this.appear();
-    };
+    }
 
     // 移動するために表示されたブロックをクリア
     this.clear = function() {
@@ -231,7 +235,7 @@ const Block = function() {
                 }
             }
         }
-    };
+    }
 
     // 再表示
     this.appear = function() {
@@ -242,7 +246,7 @@ const Block = function() {
                 }
             }
         }
-    };
+    }
 
     //固定する
     this.fix = function() {
@@ -255,7 +259,7 @@ const Block = function() {
                }
             }
         }
-    };
+    }
 
 // TODO: 左右の処理が冗長なので、まとめる
     // 左スライド
@@ -299,7 +303,6 @@ const Block = function() {
         }
         return true;
     }
-
 }
 
 // let gameOverDisplay = function(){
@@ -336,14 +339,13 @@ document.addEventListener('DOMContentLoaded',
             if(!isFallingFlag){
                fallProcess();
             }
-
             isFallingFlag = true;
             if(block.judgeGameOver()){
                 clearTimeout(loopId);
                alert('GameOver');// TODO: ゲームオーバー画面を作成したい。
                return;
             }
-         };
+         }
          loop();
 
          document.onkeydown = function(e) {
@@ -363,4 +365,3 @@ document.addEventListener('DOMContentLoaded',
          }
     }
 )
-

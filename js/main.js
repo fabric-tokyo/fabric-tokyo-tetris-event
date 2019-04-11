@@ -196,7 +196,6 @@ const blocks = {
             ],
         ]
     }
-
 }
 
 const Stage = function() {
@@ -235,30 +234,32 @@ const Stage = function() {
             getTag (row, 0) .classList.add('wall', 'inactive');
         }
     }
+
 }
 
-const Block = function() {
+const block = function() {
+
     this.keys = Object.keys(blocks);
     this.position = {x: START_X_POSITION, y: START_Y_POSITION};
     this.blockType = 0;
     this.blockPatterns = "";
-    this.block = [];
+    this.generatedBlock = [];
     this.class = "";
     this.angle = MINIMUM_ANGLE;
 
     this.initialize = function() {
-      this.position = {x: START_X_POSITION, y: START_Y_POSITION};
-      this.blockType = this.keys[Math.floor( Math.random() * (this.keys.length))];
-      this.blockPatterns = blocks[this.blockType];
-      this.class = this.blockPatterns.class
-      this.block = this.blockPatterns.pattern[this.angle];
+        this.position = {x: START_X_POSITION, y: START_Y_POSITION};
+        this.blockType = this.keys[Math.floor( Math.random() * (this.keys.length))];
+        this.blockPatterns = blocks[this.blockType];
+        this.class = this.blockPatterns.class
+        this.generatedBlock = this.blockPatterns.pattern[this.angle];
     }
 
     //ブロックを生成
     this.generate = function() {
-      for (let row = 0; row < BLOCK_SIZE; row++) {
+        for (let row = 0; row < BLOCK_SIZE; row++) {
             for (let col = 0; col < BLOCK_SIZE; col++) {
-                if (this.block[row][col]) {
+                if (this.generatedBlock[row][col]) {
                     getTag(row +this.position.y, col+this.position.x).classList.add(this.class);
                 }
             }
@@ -280,7 +281,7 @@ const Block = function() {
     // ゲームオーバー判定
     this.judgeGameOver = function() {
        for(let col = 0; col<BLOCK_SIZE; col++){
-         if( this.block[START_Y_POSITION][col] == 1 && getTag(START_Y_POSITION, this.position.x + col).classList.contains('inactive')){
+         if( this.generatedBlock[START_Y_POSITION][col] == 1 && getTag(START_Y_POSITION, this.position.x + col).classList.contains('inactive')){
              return true;
          }
       }
@@ -372,7 +373,6 @@ const Block = function() {
         for (let col = 0; col < BLOCK_SIZE; col++) {
             if(this.blockPatterns.pattern[this.angle][row][col] == 1 && getTag(row + this.position.y + 1, col + this.position.x).classList.contains('inactive')){
               return false;
-              console.log(this.position.y);
             }
         }
       }
@@ -520,60 +520,65 @@ const Block = function() {
 // TODO: 長いので余裕があったら分割したい。
 document.addEventListener('DOMContentLoaded',
     function() {
-        let loopId;
+
         let stage = new Stage();
+
         document.getElementById('board').innerHTML = stage.makeStage();
         stage.loadStage();
         stage.makeWall();
 
-        let block = new Block();
+        let generatedBlock = new block();
+
+        let loopId;
         let fallProcess = function () {
-            block.initialize();
-            block.generate();
+            generatedBlock.initialize();
+            generatedBlock.generate();
             let fallLoop = function () {
-                    loopId = setTimeout(fallLoop, FALL_TIME);
-                    if(block.judgeFall()) {
-                        block.fall();
-                    }else{
-                        block.fix();// TODO: 一番下の行ですぐに固定してしまうので、少しだけ余裕を持たせる。
-                        clearTimeout(loopId);
-                    }
+                loopId = setTimeout(fallLoop, FALL_TIME);
+                if(generatedBlock.judgeFall()) {
+                    generatedBlock.fall();
+                }else{
+                    generatedBlock.fix();// TODO: 一番下の行ですぐに固定してしまうので、少しだけ余裕を持たせる。
+                    clearTimeout(loopId);
+                }
             }
             fallLoop();
         }
-         fallProcess();
-         var loop = function() {
+        fallProcess();
+
+        var loop = function() {
             loopId = setTimeout(loop, FALL_TIME);
             if(!isFallingFlag){
-               fallProcess();
+                fallProcess();
             }
             isFallingFlag = true;
-            if(block.judgeGameOver()){
+            if(generatedBlock.judgeGameOver()){
                 clearTimeout(loopId);
-               alert('GameOver');// TODO: ゲームオーバー画面を作成したい。
-               return;
+                alert('GameOver');// TODO: ゲームオーバー画面を作成したい。
+                return;
             }
-         }
-         loop();
+        }
+        loop();
 
-         document.onkeydown = function(e) {
-             switch(e.code) {
-                 case "ArrowRight":
-                     block.moveRight(true);
-                     break;
-                 case "ArrowLeft":
-                     block.moveLeft(false);
-                     break;
-                 case "ArrowDown":
-                    block.down();
+        document.onkeydown = function(e) {
+            switch(e.code) {
+                case "ArrowRight":
+                    generatedBlock.moveRight(true);
+                    break;
+                case "ArrowLeft":
+                    generatedBlock.moveLeft(false);
+                    break;
+                case "ArrowDown":
+                    generatedBlock.down();
                     break
                 case "KeyF":
-                    block.rotate(true);
+                    generatedBlock.rotate(true);
                     break;
                 case "KeyA":
-                    block.rotate(false);
+                    generatedBlock.rotate(false);
                     break;
-             }
-         }
+            }
+        }
+
     }
 )

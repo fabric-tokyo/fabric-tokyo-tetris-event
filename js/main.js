@@ -324,7 +324,7 @@ const Block = function() {
     this.clear = function() {
         for (let row = 0; row < BLOCK_SIZE; row++) {
             for (let col = 0; col < BLOCK_SIZE; col++) {
-                if(col + this.position.x + 1 > COLUMNS){
+                if(col + this.position.x + 1 > COLUMNS || col + this.position.x - 1 < 0 || this.position.y < 0){
                   continue;
                 }
                 if(!getTag(row + this.position.y, col + this.position.x).classList.contains('inactive', this.class)){
@@ -418,7 +418,13 @@ const Block = function() {
           }
         }
         let avoidCount = 0;
-        if(this.avoidFloor) {
+        if(this.avoidWall()) {
+          avoidCount++;
+          if(this.avoidWall()) {
+            avoidCount++;
+          }
+        }
+        if(this.avoidFloor()) {
           avoidCount++;
         }
         if(avoidCount >= 2){
@@ -429,6 +435,8 @@ const Block = function() {
         this.fill;
     }
 
+    // TODO:マジックナンバーを消す
+    // 床面の回転判定
     this.avoidFloor = function() {
       for (let row = 0; row < BLOCK_SIZE; row++) {
         for (let col = 0; col < BLOCK_SIZE; col++) {
@@ -446,10 +454,42 @@ const Block = function() {
                   }
               }
 
+               }
         }
       }
-      }
     return false;
+    }
+
+    // TODO: ifのネストが深い。やっていることがわかりにくい。リファクタ必須。
+    // 壁際の回転判定
+    this.avoidWall = function() {
+      for (let row = 0; row < BLOCK_SIZE; row++) {
+        for (let col = 0; col < BLOCK_SIZE; col++) {
+          if(this.blockPatterns.pattern[this.angle][row][col] == 1){
+            if(getTag(row + this.position.y, col + this.position.x).classList.contains('inactive')) {
+              if( col == 1 ) {
+                this.position.x += 2;
+              } else if ( col == 0 ) {
+                if(getTag(row + this.position.y, col + this.position.x + 1).classList.contains('inactive')) {
+                  this.position.x += 2;
+                } else {
+                  this.position.x++;
+                }
+              } else if ( col == 2 ) {
+                this.position.x -= 2;
+              } else if ( col == 3 ) {
+                if(getTag(row + this.position.y, col + this.position.x - 1).classList.contains('inactive')) {
+                  this.position.x -= 2;
+                } else {
+                  this.position.x--;
+                }
+              }
+              return true;
+            }
+          }
+        }
+      }
+      return false;
     }
 }
 

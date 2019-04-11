@@ -1,8 +1,9 @@
 // TODO: インデントの整理
+// TODO: アロー関数を使う
 
 const COLUMNS= 12;
 const ROWS = 21;
-const FALL_TIME = 100;
+const FALL_TIME = 1000;
 const BLOCK_SIZE = 4;
 const START_X_POSITION = 4;
 const START_Y_POSITION = 0;
@@ -358,22 +359,32 @@ const Block = function() {
         }
     }
 
-// TODO: 左右の処理が冗長なので、まとめる
-    // 左スライド
-    this.moveLeft = function() {
-        if(this.judgeLeft()){
-            this.clear();
-            this.position.x--;
-            this.appear();
+    this.down = function() {
+      if(this.judgeDown()) {
+        this.clear();
+        this.position.y++;
+        this.appear();
+      }
+    }
+
+    this.judgeDown = function() {
+      for (let row = 0; row < BLOCK_SIZE; row++) {
+        for (let col = 0; col < BLOCK_SIZE; col++) {
+            if(this.blockPatterns.pattern[this.angle][row][col] == 1 && getTag(row + this.position.y + 1, col + this.position.x).classList.contains('inactive')){
+              return false;
+              console.log(this.position.y);
+            }
         }
+      }
+      return true;
     }
 
     // 右スライド
     this.moveRight = function() {
         if(this.judgeRight()){
-            this.clear();
-            this.position.x++;
-            this.appear();
+          this.clear();
+          this.position.x++;
+          this.appear();
         }
     }
 
@@ -399,6 +410,15 @@ const Block = function() {
             }
         }
         return true;
+    }
+
+    // 左スライド
+    this.moveLeft = function() {
+        if(this.judgeLeft()){
+            this.clear();
+            this.position.x--;
+            this.appear();
+        }
     }
 
     // 回転処理
@@ -545,11 +565,14 @@ document.addEventListener('DOMContentLoaded',
                      block.moveLeft(false);
                      break;
                  case "ArrowDown":
-                     block.down();
+                    block.down();
+                    break
                 case "KeyF":
                     block.rotate(true);
+                    break;
                 case "KeyA":
                     block.rotate(false);
+                    break;
              }
          }
     }

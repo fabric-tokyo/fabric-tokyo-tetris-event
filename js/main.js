@@ -6,6 +6,10 @@ const FALL_TIME = 100;
 const BLOCK_SIZE = 4;
 const START_X_POSITION = 4;
 const START_Y_POSITION = 0;
+const MINIMUM_X_POSITION = 1;
+const MAXIMUM_X_POSITION = 10;
+const MINIMUM_ANGLE = 0;
+const MAX_ANGLE = 3;
 let cells;
 let isFallingFlag = true;
 
@@ -239,7 +243,7 @@ const Block = function() {
     this.blockPatterns = "";
     this.block = [];
     this.class = "";
-    this.angle = 0;
+    this.angle = MINIMUM_ANGLE;
 
     this.initialize = function() {
       this.position = {x: START_X_POSITION, y: START_Y_POSITION};
@@ -264,7 +268,7 @@ const Block = function() {
     this.judgeFall = function() {
         for (let row = 0; row < BLOCK_SIZE; row++) {
             for (let col = 0; col < BLOCK_SIZE; col++) {
-                  if( this.block[row][col] == 1 && getTag(row + this.position.y + 1, col + this.position.x).classList.contains('inactive')) {
+                  if( this.blockPatterns.pattern[this.angle][row][col] == 1 && getTag(row + this.position.y + 1, col + this.position.x).classList.contains('inactive')) {
                      return false;
                   }
             }
@@ -334,7 +338,7 @@ const Block = function() {
     this.appear = function() {
         for (let row = 0; row < BLOCK_SIZE; row++) {
             for (let col = 0; col < BLOCK_SIZE; col++) {
-                if (this.block[row][col]) {
+                if (this.blockPatterns.pattern[this.angle][row][col] == 1) {
                     getTag(row +this.position.y, col+this.position.x).classList.add(this.class);
                 }
             }
@@ -345,7 +349,7 @@ const Block = function() {
     this.fix = function() {
         for (let row = 0; row < BLOCK_SIZE; row++) {
             for (let col = 0; col < BLOCK_SIZE; col++) {
-               if (this.block[row][col]) {
+               if (this.blockPatterns.pattern[this.angle][row][col]) {
                      getTag(row +this.position.y, col+this.position.x).classList.add(this.class, 'inactive');
                      isFallingFlag = false;
                      this.judgeErase(row + this.position.y);
@@ -377,7 +381,7 @@ const Block = function() {
     this.judgeRight = function() {
         for (let row = 0; row < BLOCK_SIZE; row++) {
             for (let col = 0; col < BLOCK_SIZE; col++) {
-                  if( this.block[row][col] == 1 && getTag(row + this.position.y, col + this.position.x + 1).classList.contains('inactive')) {
+                  if( this.blockPatterns.pattern[this.angle][row][col] == 1 && getTag(row + this.position.y, col + this.position.x + 1).classList.contains('inactive')) {
                      return false;
                   }
             }
@@ -386,10 +390,10 @@ const Block = function() {
     }
 
      //  左方向ぶつかり判定
-    this.judgeLeft = function(left) {
+    this.judgeLeft = function() {
         for (let row = 0; row < BLOCK_SIZE; row++) {
             for (let col = 0; col < BLOCK_SIZE; col++) {
-                  if( this.block[row][col] == 1 && getTag(row + this.position.y, col + this.position.x - 1).classList.contains('inactive')) {
+                  if( this.blockPatterns.pattern[this.angle][row][col] == 1 && getTag(row + this.position.y, col + this.position.x - 1).classList.contains('inactive')) {
                      return false;
                   }
             }
@@ -398,8 +402,54 @@ const Block = function() {
     }
 
     // 回転処理
-    this.rotate = function() {
+    this.rotate = function(right) {
         this.clear();
+        let currentAngle = this.angle;
+        if( right ) {
+          this.angle++;
+          if( this.angle > MAX_ANGLE) {
+            this.angle = MINIMUM_ANGLE;
+          }
+        }
+        if(!right) {
+          this.angle--;
+          if( this.angle < MINIMUM_ANGLE) {
+            this.angle = MAX_ANGLE;
+          }
+        }
+        let avoidCount = 0;
+        if(this.avoidFloor) {
+          avoidCount++;
+        }
+        if(avoidCount >= 2){
+          this.angle = currentAngle;
+        }
+        console.log(this.angle);
+        console.log(this.avoidCount);
+        this.fill;
+    }
+
+    this.avoidFloor = function() {
+      for (let row = 0; row < BLOCK_SIZE; row++) {
+        for (let col = 0; col < BLOCK_SIZE; col++) {
+              if(this.blockPatterns.pattern[this.angle][row][col] == 1) {
+                if(getTag(row + this.position.y, col + this.position.x).classList.contains('inactive')){
+                  if(row == 2){
+                    this.position.y -=2;
+                  } else if(col == 3) {
+                    if(getTag(row + this.position.y, col + this.position.x + 1).classList.contains('inactive')) {
+                      this.position.y -=1;
+                    } else {
+                      this.position.y--;
+                    }
+                    return true;
+                  }
+              }
+
+        }
+      }
+      }
+    return false;
     }
 }
 
@@ -457,9 +507,9 @@ document.addEventListener('DOMContentLoaded',
                  case "ArrowDown":
                      block.down();
                 case "KeyF":
-                    block.rotate();
+                    block.rotate(true);
                 case "KeyA":
-                    block.rotate();
+                    block.rotate(false);
              }
          }
     }

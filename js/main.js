@@ -212,7 +212,7 @@ const makeStage = () => {
 // テトリスのステージを２次元配列に格納する
 const storeStageInTwoDimensionalArray = () => {
   cells = [];
-  let tdArray = document.getElementsByTagName('td');
+  const tdArray = document.getElementsByTagName('td');
   let index = 0;
   for (let row = 0; row < ROWS; row++) {
     cells[row] = [];
@@ -426,7 +426,7 @@ function Block() {
   // FとAのキーボードを押すとそれぞれ左右に回転する
   this.rotate = (direction) => {
     this.clear();
-    let currentAngle = this.angle;
+    const currentAngle = this.angle;
     if (direction == 'left') {
       this.angle++;
       if (this.angle > MAX_ANGLE) {
@@ -452,7 +452,6 @@ function Block() {
     if (avoidCount >= 2) {
       this.angle = currentAngle;
     }
-    this.fill;
   }
 
   // TODO: [WANT]マジックナンバーを消す
@@ -517,19 +516,17 @@ function Block() {
 // DOMが呼び込まれたらテトリススタート
 document.addEventListener('DOMContentLoaded',
   function () {
-    let fallId;
-    let restart;
 
     document.getElementById('board').innerHTML = makeStage();
 
     const stageArray = storeStageInTwoDimensionalArray();
     makeWall(stageArray);
 
-    let tetrimino = new Block();
-    let fallProcess = function () {
+    const tetrimino = new Block();
+    const fallProcess = function () {
       tetrimino.initialize();
       tetrimino.generate();
-      let fallLoop = function () {
+      const fallLoop = function () {
         if (tetrimino.judgeFall()) {
           tetrimino.fall();
         } else {
@@ -537,10 +534,10 @@ document.addEventListener('DOMContentLoaded',
           clearInterval(fallId);
         }
       }
-      fallId = setInterval(fallLoop, FALL_INTERVAL);;
+      const fallId = setInterval(fallLoop, FALL_INTERVAL);;
     }
     fallProcess();
-    var loop = function () {
+    const loop = function () {
       if (!isFallingFlag) {
         fallProcess();
       }
@@ -551,7 +548,7 @@ document.addEventListener('DOMContentLoaded',
         return;
       }
     }
-    restart = setInterval(loop, RESTART_INTERVAL);
+    const restart = setInterval(loop, RESTART_INTERVAL);
 
     document.onkeydown = function (downedKey) {
       if (isFallingFlag == true) {

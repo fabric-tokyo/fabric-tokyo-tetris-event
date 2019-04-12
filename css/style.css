@@ -14,31 +14,31 @@ td {
     height: 40px;
 }
 
-.i {
+.tetrimino-i {
     background-color: cyan;
 }
 
-.o {
+.tetrimino-o {
     background-color: yellow;
 }
 
-.t {
+.tetrimino-t {
     background-color: purple;
 }
 
-.s {
+.tetrimino-s {
     background-color: green;
 }
 
-.z {
+.tetrimino-z {
     background-color: red;
 }
 
-.j {
+.tetrimino-j {
     background-color: blue;
 }
 
-.l {
+.tetrimino-l {
     background-color: orange;
 }
 

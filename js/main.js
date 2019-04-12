@@ -1,27 +1,24 @@
-// TODO: インデントの整理
-// TODO: アロー関数を使う
-
 const COLUMNS = 12;
 const ROWS = 21;
-const FALL_TIME = 1000;
+const FALL_INTERVAL = 500;
+const RESTART_INTERVAL = 500;
 const BLOCK_SIZE = 4;
 const START_X_POSITION = 4;
 const START_Y_POSITION = 0;
-const MINIMUM_X_POSITION = 1;
-const MAXIMUM_X_POSITION = 10;
 const MINIMUM_ANGLE = 0;
 const MAX_ANGLE = 3;
 let cells;
 let isFallingFlag = true;
 
-//現在位置のタグを入手
-const getTag = (x, y) => {
-  return cells[x][y];
+//現在位置のHTMLタグを入手
+const getTetriminoPosition = (x, y) => {
+  return cells[y][x];
 }
 
 
-const blocks = {
-  i: {
+//テトリミノの種類を定義(回転含む)
+const tetriminos = {
+  tetriminoI: {
     class: "i",
     pattern: [
       [
@@ -37,10 +34,10 @@ const blocks = {
         [0, 0, 0, 0]
       ],
       [
-        [0, 0, 1, 0],
-        [0, 0, 1, 0],
-        [0, 0, 1, 0],
-        [0, 0, 1, 0]
+        [0, 1, 0, 0],
+        [0, 1, 0, 0],
+        [0, 1, 0, 0],
+        [0, 1, 0, 0]
       ],
       [
         [0, 0, 0, 0],
@@ -51,7 +48,7 @@ const blocks = {
 
     ]
   },
-  o: {
+  tetriminoO: {
     class: "o",
     pattern: [
       [
@@ -80,7 +77,7 @@ const blocks = {
       ]
     ]
   },
-  t: {
+  tetriminoT: {
     class: "t",
     pattern: [
       [
@@ -109,7 +106,7 @@ const blocks = {
       ]
     ]
   },
-  s: {
+  tetriminoS: {
     class: "z",
     pattern: [
       [
@@ -138,7 +135,7 @@ const blocks = {
       ]
     ]
   },
-  j: {
+  tetriminoJ: {
     class: "j",
     pattern: [
       [
@@ -167,7 +164,7 @@ const blocks = {
       ]
     ]
   },
-  l: {
+  tetriminoL: {
     class: "l",
     pattern: [
       [
@@ -189,9 +186,9 @@ const blocks = {
         [0, 0, 0, 0]
       ],
       [
-        [0, 1, 1, 0],
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
+        [1, 1, 0, 0],
+        [1, 0, 0, 0],
+        [1, 0, 0, 0],
         [0, 0, 0, 0]
       ],
     ]
@@ -199,77 +196,80 @@ const blocks = {
 
 }
 
-const Stage = function () {
-
-  this.makeStage = function () {
-    let table = "";
-    for (let row = 0; row < ROWS; row++) {
-      table = table + '<tr>';
-      for (let col = 0; col < COLUMNS; col++) {
-        table = table + '<td/>';
-      }
-      table = table + '</tr>';
-    }
-    return table;
-  }
-
-  this.loadStage = function () {
-    cells = [];
-    let tdArray = document.getElementsByTagName('td');
-    let index = 0;
-    for (let row = 0; row < ROWS; row++) {
-      cells[row] = [];
-      for (let col = 0; col < COLUMNS; col++) {
-        cells[row][col] = tdArray[index];
-        index++;
-      }
-    }
-  }
-
-  this.makeWall = function () {
+// テトリスのステージを作成
+const makeStage = () => {
+  let table = "";
+  for (let row = 0; row < ROWS; row++) {
+    table = table + '<tr>';
     for (let col = 0; col < COLUMNS; col++) {
-      getTag(ROWS - 1, col).classList.add('wall', 'inactive');
+      table = table + '<td/>';
     }
-    for (let row = 0; row < ROWS; row++) {
-      getTag(row, COLUMNS - 1).classList.add('wall', 'inactive');
-      getTag(row, 0).classList.add('wall', 'inactive');
+    table = table + '</tr>';
+  }
+  return table;
+}
+
+// テトリスのステージを２次元配列に格納する
+const storeStageInTwoDimensionalArray = () => {
+  cells = [];
+  let tdArray = document.getElementsByTagName('td');
+  let index = 0;
+  for (let row = 0; row < ROWS; row++) {
+    cells[row] = [];
+    for (let col = 0; col < COLUMNS; col++) {
+      cells[row][col] = tdArray[index];
+      index++;
     }
+  }
+  return cells;
+}
+
+// 壁のclassに.wallと.inactiveを付与
+const makeWall = (cell) => {
+  for (let col = 0; col < COLUMNS; col++) {
+    cell[ROWS - 1][col].classList.add('wall', 'inactive');
+  }
+  for (let row = 0; row < ROWS; row++) {
+    cell[row][COLUMNS - 1].classList.add('wall', 'inactive');
+    cell[row][0].classList.add('wall', 'inactive');
   }
 }
 
-const Block = function () {
-  this.keys = Object.keys(blocks);
+//TODO: [SHOULD]プロトタイプをやめたい。
+function Block() {
+  this.keys = Object.keys(tetriminos);
   this.position = { x: START_X_POSITION, y: START_Y_POSITION };
-  this.blockType = 0;
-  this.blockPatterns = "";
-  this.block = [];
-  this.class = "";
   this.angle = MINIMUM_ANGLE;
 
-  this.initialize = function () {
+  this.initialize = () => {
     this.position = { x: START_X_POSITION, y: START_Y_POSITION };
-    this.blockType = this.keys[Math.floor(Math.random() * (this.keys.length))];
-    this.blockPatterns = blocks[this.blockType];
-    this.class = this.blockPatterns.class
-    this.block = this.blockPatterns.pattern[this.angle];
+    this.tetriminoType = this.keys[Math.floor(Math.random() * (this.keys.length))];
+    this.tetriminoPatterns = tetriminos[this.tetriminoType];
+    this.class = this.tetriminoPatterns.class
+    this.tetrimino = this.tetriminoPatterns.pattern[this.angle];
   }
 
-  //ブロックを生成
-  this.generate = function () {
+  // ステージ全体の中でテトリミノがある位置の座標を取得
+  this.getTetriminoGlobalPosition = (x, y) => {
+    return cells[y + this.position.y][x + this.position.x];
+  }
+
+  //テトリミノを生成
+  this.generate = () => {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
-        if (this.block[row][col]) {
-          getTag(row + this.position.y, col + this.position.x).classList.add(this.class);
+        if (this.tetrimino[row][col]) {
+          this.getTetriminoGlobalPosition(col, row).classList.add(this.class);
         }
       }
     }
   }
 
-  //下方向判定
-  this.judgeFall = function () {
+  // テトリミノが今の位置より下に落ちられるかどうかを判定
+  this.judgeFall = () => {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
-        if (this.blockPatterns.pattern[this.angle][row][col] == 1 && getTag(row + this.position.y + 1, col + this.position.x).classList.contains('inactive')) {
+        if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1 && this.getTetriminoGlobalPosition(col, row + 1).classList.contains('inactive')) {
           return false;
         }
       }
@@ -277,81 +277,82 @@ const Block = function () {
     return true;
   }
 
-  // ゲームオーバー判定
-  this.judgeGameOver = function () {
+  // ゲームオーバーであるかどうかを判定
+  this.judgeGameOver = () => {
     for (let col = 0; col < BLOCK_SIZE; col++) {
-      if (this.block[START_Y_POSITION][col] == 1 && getTag(START_Y_POSITION, this.position.x + col).classList.contains('inactive')) {
+      if (this.tetrimino[START_Y_POSITION][col] == 1 && this.getTetriminoGlobalPosition(col, START_Y_POSITION).classList.contains('inactive')) {
         return true;
       }
     }
     return false;
   }
 
-  // 消去判定
-  this.judgeErase = function (globalY) {
+  // テトリミノが一列揃ったときに列を消去する判定
+  this.judgeErase = (globalY) => {
     let count = 0;
     for (let col = 0; col < COLUMNS - 1; col++) {
-      if (getTag(globalY, col).classList.contains('inactive')) {
+      if (getTetriminoPosition(col, globalY).classList.contains('inactive')) {
         count++
       }
       if (count == COLUMNS - 1) {
-        this.erase(globalY);
+        this.eraseAndShift(globalY);
       }
     }
   }
 
-  // 消去
-  this.erase = function (globalY) {
+  // テトリミノを一列消去して一段下げる
+  this.eraseAndShift = (globalY) => {
     for (let col = 1; col < COLUMNS - 1; col++) {
-      getTag(globalY, col).className = "";
+      getTetriminoPosition(col, globalY).className = "";
     }
     //一段下げる
     for (let downRow = globalY - 1; downRow > 0; downRow--) {
       for (let col = 1; col < COLUMNS - 1; col++) {
-        getTag(downRow + 1, col).className = getTag(downRow, col).className;
-        getTag(downRow, col).className = "";
+        getTetriminoPosition(col, downRow + 1).className = getTetriminoPosition(col, downRow).className;
+        getTetriminoPosition(col, downRow).className = "";
       }
     }
   }
 
   // 落下処理
-  this.fall = function () {
+  this.fall = () => {
     this.clear();
     this.position.y++;
     this.appear();
   }
 
   // 移動するために表示されたブロックをクリア
-  this.clear = function () {
+  this.clear = () => {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
         if (col + this.position.x + 1 > COLUMNS || col + this.position.x - 1 < 0 || this.position.y < 0) {
           continue;
         }
-        if (!getTag(row + this.position.y, col + this.position.x).classList.contains('inactive', this.class)) {
-          getTag(row + this.position.y, col + this.position.x).classList.remove(this.class);
+        if (!this.getTetriminoGlobalPosition(col, row).classList.contains('inactive', this.class)) {
+          console.log(row + this.position.y, col + this.position.x);
+          this.getTetriminoGlobalPosition(col, row).classList.remove(this.class);
         }
       }
     }
   }
 
-  // 再表示
-  this.appear = function () {
+  // 移動のために消えたテトリミノを再表示
+  this.appear = () => {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
-        if (this.blockPatterns.pattern[this.angle][row][col] == 1) {
-          getTag(row + this.position.y, col + this.position.x).classList.add(this.class);
+        if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1) {
+          this.getTetriminoGlobalPosition(col, row).classList.add(this.class);
         }
       }
     }
   }
 
-  //固定する
-  this.fix = function () {
+  // テトリミノの位置を固定する
+  this.fix = () => {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
-        if (this.blockPatterns.pattern[this.angle][row][col]) {
-          getTag(row + this.position.y, col + this.position.x).classList.add(this.class, 'inactive');
+        if (this.tetriminoPatterns.pattern[this.angle][row][col]) {
+          this.getTetriminoGlobalPosition(col, row).classList.add(this.class, 'inactive');
           isFallingFlag = false;
           this.judgeErase(row + this.position.y);
         }
@@ -359,7 +360,8 @@ const Block = function () {
     }
   }
 
-  this.down = function () {
+  // 矢印の下を押したときに下がるスピードが上がる
+  this.down = () => {
     if (this.judgeDown()) {
       this.clear();
       this.position.y++;
@@ -367,20 +369,20 @@ const Block = function () {
     }
   }
 
-  this.judgeDown = function () {
+  // テトリミノを下げても良いか判定
+  this.judgeDown = () => {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
-        if (this.blockPatterns.pattern[this.angle][row][col] == 1 && getTag(row + this.position.y + 1, col + this.position.x).classList.contains('inactive')) {
+        if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1 && this.getTetriminoGlobalPosition(col, row + 1).classList.contains('inactive')) {
           return false;
-          console.log(this.position.y);
         }
       }
     }
     return true;
   }
 
-  // 右スライド
-  this.moveRight = function () {
+  // 右キーを押したときにスライド
+  this.moveRight = () => {
     if (this.judgeRight()) {
       this.clear();
       this.position.x++;
@@ -388,11 +390,11 @@ const Block = function () {
     }
   }
 
-  // 右方向ぶつかり判定
-  this.judgeRight = function () {
+  // 右方向のに移動しても良いか判定
+  this.judgeRight = () => {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
-        if (this.blockPatterns.pattern[this.angle][row][col] == 1 && getTag(row + this.position.y, col + this.position.x + 1).classList.contains('inactive')) {
+        if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1 && this.getTetriminoGlobalPosition(col + 1, row).classList.contains('inactive')) {
           return false;
         }
       }
@@ -400,11 +402,11 @@ const Block = function () {
     return true;
   }
 
-  //  左方向ぶつかり判定
-  this.judgeLeft = function () {
+  //  左方向に移動しても良いか判定
+  this.judgeLeft = () => {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
-        if (this.blockPatterns.pattern[this.angle][row][col] == 1 && getTag(row + this.position.y, col + this.position.x - 1).classList.contains('inactive')) {
+        if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1 && this.getTetriminoGlobalPosition(col - 1, row).classList.contains('inactive')) {
           return false;
         }
       }
@@ -412,8 +414,8 @@ const Block = function () {
     return true;
   }
 
-  // 左スライド
-  this.moveLeft = function () {
+  // 左キーボードが押されたら方向にスライドする
+  this.moveLeft = () => {
     if (this.judgeLeft()) {
       this.clear();
       this.position.x--;
@@ -421,17 +423,17 @@ const Block = function () {
     }
   }
 
-  // 回転処理
-  this.rotate = function (right) {
+  // FとAのキーボードを押すとそれぞれ左右に回転する
+  this.rotate = (direction) => {
     this.clear();
     let currentAngle = this.angle;
-    if (right) {
+    if (direction == 'left') {
       this.angle++;
       if (this.angle > MAX_ANGLE) {
         this.angle = MINIMUM_ANGLE;
       }
     }
-    if (!right) {
+    if (direction == 'right') {
       this.angle--;
       if (this.angle < MINIMUM_ANGLE) {
         this.angle = MAX_ANGLE;
@@ -450,22 +452,20 @@ const Block = function () {
     if (avoidCount >= 2) {
       this.angle = currentAngle;
     }
-    console.log(this.angle);
-    console.log(this.avoidCount);
     this.fill;
   }
 
-  // TODO:マジックナンバーを消す
-  // 床面の回転判定
-  this.avoidFloor = function () {
+  // TODO: [WANT]マジックナンバーを消す
+  // 回転したときに床にぶつかる場合は上にあげる
+  this.avoidFloor = () => {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
-        if (this.blockPatterns.pattern[this.angle][row][col] == 1) {
-          if (getTag(row + this.position.y, col + this.position.x).classList.contains('inactive')) {
+        if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1) {
+          if (this.getTetriminoGlobalPosition(col, row).classList.contains('inactive')) {
             if (row == 2) {
               this.position.y -= 2;
             } else if (col == 3) {
-              if (getTag(row + this.position.y, col + this.position.x + 1).classList.contains('inactive')) {
+              if (this.getTetriminoGlobalPosition(col + 1, row).classList.contains('inactive')) {
                 this.position.y -= 1;
               } else {
                 this.position.y--;
@@ -480,17 +480,18 @@ const Block = function () {
     return false;
   }
 
-  // TODO: ifのネストが深い。やっていることがわかりにくい。リファクタ必須。
-  // 壁際の回転判定
-  this.avoidWall = function () {
+  // TODO: [WANT]ifのネストが深い。やっていることがわかりにくい。リファクタ必須。
+  // 回転したときに壁にぶつかる場合はずらして回転させる判定
+  this.avoidWall = () => {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
-        if (this.blockPatterns.pattern[this.angle][row][col] == 1) {
-          if (getTag(row + this.position.y, col + this.position.x).classList.contains('inactive')) {
+        console.log(col, row, row + this.position.y, col + this.position.x);
+        if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1) {
+          if (this.getTetriminoGlobalPosition(col, row).classList.contains('inactive')) {
             if (col == 1) {
               this.position.x += 2;
             } else if (col == 0) {
-              if (getTag(row + this.position.y, col + this.position.x + 1).classList.contains('inactive')) {
+              if (this.getTetriminoGlobalPosition(col + 1, row).classList.contains('inactive')) {
                 this.position.x += 2;
               } else {
                 this.position.x++;
@@ -498,7 +499,7 @@ const Block = function () {
             } else if (col == 2) {
               this.position.x -= 2;
             } else if (col == 3) {
-              if (getTag(row + this.position.y, col + this.position.x - 1).classList.contains('inactive')) {
+              if (this.getTetriminoGlobalPosition(col - 1, row).classList.contains('inactive')) {
                 this.position.x -= 2;
               } else {
                 this.position.x--;
@@ -513,66 +514,64 @@ const Block = function () {
   }
 }
 
-// let gameOverDisplay = function(){
-
-// }
-
-// TODO: 長いので余裕があったら分割したい。
+// DOMが呼び込まれたらテトリススタート
 document.addEventListener('DOMContentLoaded',
   function () {
-    let loopId;
-    let stage = new Stage();
-    document.getElementById('board').innerHTML = stage.makeStage();
-    stage.loadStage();
-    stage.makeWall();
+    let fallId;
+    let restart;
 
-    let block = new Block();
+    document.getElementById('board').innerHTML = makeStage();
+
+    const stageArray = storeStageInTwoDimensionalArray();
+    makeWall(stageArray);
+
+    let tetrimino = new Block();
     let fallProcess = function () {
-      block.initialize();
-      block.generate();
+      tetrimino.initialize();
+      tetrimino.generate();
       let fallLoop = function () {
-        loopId = setTimeout(fallLoop, FALL_TIME);
-        if (block.judgeFall()) {
-          block.fall();
+        if (tetrimino.judgeFall()) {
+          tetrimino.fall();
         } else {
-          block.fix();// TODO: 一番下の行ですぐに固定してしまうので、少しだけ余裕を持たせる。
-          clearTimeout(loopId);
+          tetrimino.fix();
+          clearInterval(fallId);
         }
       }
-      fallLoop();
+      fallId = setInterval(fallLoop, FALL_INTERVAL);;
     }
     fallProcess();
     var loop = function () {
-      loopId = setTimeout(loop, FALL_TIME);
       if (!isFallingFlag) {
         fallProcess();
       }
       isFallingFlag = true;
-      if (block.judgeGameOver()) {
-        clearTimeout(loopId);
-        alert('GameOver');// TODO: ゲームオーバー画面を作成したい。
+      if (tetrimino.judgeGameOver()) {
+        clearInterval(restart);
+        alert('GameOver');// WANT: ゲームオーバー画面を作成したい。
         return;
       }
     }
-    loop();
+    restart = setInterval(loop, RESTART_INTERVAL);
 
-    document.onkeydown = function (e) {
-      switch (e.code) {
-        case "ArrowRight":
-          block.moveRight(true);
-          break;
-        case "ArrowLeft":
-          block.moveLeft(false);
-          break;
-        case "ArrowDown":
-          block.down();
-          break
-        case "KeyF":
-          block.rotate(true);
-          break;
-        case "KeyA":
-          block.rotate(false);
-          break;
+    document.onkeydown = function (downedKey) {
+      if (isFallingFlag == true) {
+        switch (downedKey.code) {
+          case "ArrowRight":
+            tetrimino.moveRight();
+            break;
+          case "ArrowLeft":
+            tetrimino.moveLeft();
+            break;
+          case "ArrowDown":
+            tetrimino.down();
+            break
+          case "KeyF":
+            tetrimino.rotate('right');
+            break;
+          case "KeyA":
+            tetrimino.rotate('left');
+            break;
+        }
       }
     }
   }

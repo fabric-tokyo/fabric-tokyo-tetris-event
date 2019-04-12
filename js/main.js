@@ -316,13 +316,13 @@ function Block() {
 
   // 落下処理
   this.fall = () => {
-    this.clear();
+    clear();
     this.position.y++;
-    this.appear();
+    appear();
   }
 
   // 移動するために表示されたブロックをクリア
-  this.clear = () => {
+  const clear = () => {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
         if (col + this.position.x + 1 > COLUMNS || col + this.position.x - 1 < 0 || this.position.y < 0) {
@@ -337,7 +337,7 @@ function Block() {
   }
 
   // 移動のために消えたテトリミノを再表示
-  this.appear = () => {
+  const appear = () => {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
         if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1) {
@@ -362,15 +362,15 @@ function Block() {
 
   // 矢印の下を押したときに下がるスピードが上がる
   this.down = () => {
-    if (this.judgeDown()) {
-      this.clear();
+    if (judgeDown()) {
+      clear();
       this.position.y++;
-      this.appear();
+      appear();
     }
   }
 
   // テトリミノを下げても良いか判定
-  this.judgeDown = () => {
+  const judgeDown = () => {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
         if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1 && this.getTargetHtmlTagFromGlobalPosition(col, row + 1).classList.contains('inactive')) {
@@ -383,15 +383,15 @@ function Block() {
 
   // 右キーを押したときにスライド
   this.moveRight = () => {
-    if (this.judgeRight()) {
-      this.clear();
+    if (judgeRight()) {
+      clear();
       this.position.x++;
-      this.appear();
+      appear();
     }
   }
 
   // 右方向のに移動しても良いか判定
-  this.judgeRight = () => {
+  const judgeRight = () => {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
         if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1 && this.getTargetHtmlTagFromGlobalPosition(col + 1, row).classList.contains('inactive')) {
@@ -403,7 +403,7 @@ function Block() {
   }
 
   //  左方向に移動しても良いか判定
-  this.judgeLeft = () => {
+  const judgeLeft = () => {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
         if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1 && this.getTargetHtmlTagFromGlobalPosition(col - 1, row).classList.contains('inactive')) {
@@ -416,16 +416,16 @@ function Block() {
 
   // 左キーボードが押されたら方向にスライドする
   this.moveLeft = () => {
-    if (this.judgeLeft()) {
-      this.clear();
+    if (judgeLeft()) {
+      clear();
       this.position.x--;
-      this.appear();
+      appear();
     }
   }
 
   // FとAのキーボードを押すとそれぞれ左右に回転する
   this.rotate = (direction) => {
-    this.clear();
+    clear();
     const currentAngle = this.angle;
     if (direction == 'left') {
       this.angle++;
@@ -440,13 +440,13 @@ function Block() {
       }
     }
     let avoidCount = 0;
-    if (this.avoidWall()) {
+    if (avoidWall()) {
       avoidCount++;
-      if (this.avoidWall()) {
+      if (avoidWall()) {
         avoidCount++;
       }
     }
-    if (this.avoidFloor()) {
+    if (avoidFloor()) {
       avoidCount++;
     }
     if (avoidCount >= 2) {
@@ -456,7 +456,7 @@ function Block() {
 
   // TODO: [WANT]マジックナンバーを消す
   // 回転したときに床にぶつかる場合は上にあげる
-  this.avoidFloor = () => {
+  const avoidFloor = () => {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
         if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1) {
@@ -481,7 +481,7 @@ function Block() {
 
   // TODO: [WANT]ifのネストが深い。やっていることがわかりにくい。リファクタ必須。
   // 回転したときに壁にぶつかる場合はずらして回転させる判定
-  this.avoidWall = () => {
+  const avoidWall = () => {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
         console.log(col, row, row + this.position.y, col + this.position.x);

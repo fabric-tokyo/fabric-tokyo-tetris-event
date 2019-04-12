@@ -241,7 +241,7 @@ function Block() {
   this.position = { x: START_X_POSITION, y: START_Y_POSITION };
   this.angle = MINIMUM_ANGLE;
 
-  this.initialize = () => {
+  const initialize = () => {
     this.position = { x: START_X_POSITION, y: START_Y_POSITION };
     this.tetriminoType = this.keys[Math.floor(Math.random() * (this.keys.length))];
     this.tetriminoPatterns = blockParts[this.tetriminoType];
@@ -256,6 +256,7 @@ function Block() {
 
   //テトリミノを生成
   this.generate = () => {
+    initialize();
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
         if (this.tetrimino[row][col]) {
@@ -524,7 +525,6 @@ document.addEventListener('DOMContentLoaded',
 
     const tetrimino = new Block();
     const fallProcess = function () {
-      tetrimino.initialize();
       tetrimino.generate();
       const fallLoop = function () {
         if (tetrimino.judgeFall()) {

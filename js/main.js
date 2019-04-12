@@ -11,7 +11,7 @@ let cells;
 let isFallingFlag = true;
 
 //現在位置のHTMLタグを入手
-const getTetriminoPosition = (x, y) => {
+const getTetriminoHtmlTag = (x, y) => {
   return cells[y][x];
 }
 
@@ -250,7 +250,7 @@ function Block() {
   }
 
   // ステージ全体の中でテトリミノがある位置の座標を取得
-  this.getTetriminoGlobalPosition = (x, y) => {
+  this.getTetriminoHtmlTagFromGlobalPosition = (x, y) => {
     return cells[y + this.position.y][x + this.position.x];
   }
 
@@ -259,7 +259,7 @@ function Block() {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
         if (this.tetrimino[row][col]) {
-          this.getTetriminoGlobalPosition(col, row).classList.add(this.class);
+          this.getTetriminoHtmlTagFromGlobalPosition(col, row).classList.add(this.class);
         }
       }
     }
@@ -269,7 +269,7 @@ function Block() {
   this.judgeFall = () => {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
-        if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1 && this.getTetriminoGlobalPosition(col, row + 1).classList.contains('inactive')) {
+        if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1 && this.getTetriminoHtmlTagFromGlobalPosition(col, row + 1).classList.contains('inactive')) {
           return false;
         }
       }
@@ -280,7 +280,7 @@ function Block() {
   // ゲームオーバーであるかどうかを判定
   this.judgeGameOver = () => {
     for (let col = 0; col < BLOCK_SIZE; col++) {
-      if (this.tetrimino[START_Y_POSITION][col] == 1 && this.getTetriminoGlobalPosition(col, START_Y_POSITION).classList.contains('inactive')) {
+      if (this.tetrimino[START_Y_POSITION][col] == 1 && this.getTetriminoHtmlTagFromGlobalPosition(col, START_Y_POSITION).classList.contains('inactive')) {
         return true;
       }
     }
@@ -291,7 +291,7 @@ function Block() {
   this.judgeErase = (globalY) => {
     let count = 0;
     for (let col = 0; col < COLUMNS - 1; col++) {
-      if (getTetriminoPosition(col, globalY).classList.contains('inactive')) {
+      if (getTetriminoHtmlTag(col, globalY).classList.contains('inactive')) {
         count++
       }
       if (count == COLUMNS - 1) {
@@ -303,13 +303,13 @@ function Block() {
   // テトリミノを一列消去して一段下げる
   this.eraseAndShift = (globalY) => {
     for (let col = 1; col < COLUMNS - 1; col++) {
-      getTetriminoPosition(col, globalY).className = "";
+      getTetriminoHtmlTag(col, globalY).className = "";
     }
     //一段下げる
     for (let downRow = globalY - 1; downRow > 0; downRow--) {
       for (let col = 1; col < COLUMNS - 1; col++) {
-        getTetriminoPosition(col, downRow + 1).className = getTetriminoPosition(col, downRow).className;
-        getTetriminoPosition(col, downRow).className = "";
+        getTetriminoHtmlTag(col, downRow + 1).className = getTetriminoHtmlTag(col, downRow).className;
+        getTetriminoHtmlTag(col, downRow).className = "";
       }
     }
   }
@@ -328,9 +328,9 @@ function Block() {
         if (col + this.position.x + 1 > COLUMNS || col + this.position.x - 1 < 0 || this.position.y < 0) {
           continue;
         }
-        if (!this.getTetriminoGlobalPosition(col, row).classList.contains('inactive', this.class)) {
+        if (!this.getTetriminoHtmlTagFromGlobalPosition(col, row).classList.contains('inactive', this.class)) {
           console.log(row + this.position.y, col + this.position.x);
-          this.getTetriminoGlobalPosition(col, row).classList.remove(this.class);
+          this.getTetriminoHtmlTagFromGlobalPosition(col, row).classList.remove(this.class);
         }
       }
     }
@@ -341,7 +341,7 @@ function Block() {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
         if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1) {
-          this.getTetriminoGlobalPosition(col, row).classList.add(this.class);
+          this.getTetriminoHtmlTagFromGlobalPosition(col, row).classList.add(this.class);
         }
       }
     }
@@ -352,7 +352,7 @@ function Block() {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
         if (this.tetriminoPatterns.pattern[this.angle][row][col]) {
-          this.getTetriminoGlobalPosition(col, row).classList.add(this.class, 'inactive');
+          this.getTetriminoHtmlTagFromGlobalPosition(col, row).classList.add(this.class, 'inactive');
           isFallingFlag = false;
           this.judgeErase(row + this.position.y);
         }
@@ -373,7 +373,7 @@ function Block() {
   this.judgeDown = () => {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
-        if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1 && this.getTetriminoGlobalPosition(col, row + 1).classList.contains('inactive')) {
+        if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1 && this.getTetriminoHtmlTagFromGlobalPosition(col, row + 1).classList.contains('inactive')) {
           return false;
         }
       }
@@ -394,7 +394,7 @@ function Block() {
   this.judgeRight = () => {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
-        if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1 && this.getTetriminoGlobalPosition(col + 1, row).classList.contains('inactive')) {
+        if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1 && this.getTetriminoHtmlTagFromGlobalPosition(col + 1, row).classList.contains('inactive')) {
           return false;
         }
       }
@@ -406,7 +406,7 @@ function Block() {
   this.judgeLeft = () => {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
-        if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1 && this.getTetriminoGlobalPosition(col - 1, row).classList.contains('inactive')) {
+        if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1 && this.getTetriminoHtmlTagFromGlobalPosition(col - 1, row).classList.contains('inactive')) {
           return false;
         }
       }
@@ -461,11 +461,11 @@ function Block() {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
         if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1) {
-          if (this.getTetriminoGlobalPosition(col, row).classList.contains('inactive')) {
+          if (this.getTetriminoHtmlTagFromGlobalPosition(col, row).classList.contains('inactive')) {
             if (row == 2) {
               this.position.y -= 2;
             } else if (col == 3) {
-              if (this.getTetriminoGlobalPosition(col + 1, row).classList.contains('inactive')) {
+              if (this.getTetriminoHtmlTagFromGlobalPosition(col + 1, row).classList.contains('inactive')) {
                 this.position.y -= 1;
               } else {
                 this.position.y--;
@@ -487,11 +487,11 @@ function Block() {
       for (let col = 0; col < BLOCK_SIZE; col++) {
         console.log(col, row, row + this.position.y, col + this.position.x);
         if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1) {
-          if (this.getTetriminoGlobalPosition(col, row).classList.contains('inactive')) {
+          if (this.getTetriminoHtmlTagFromGlobalPosition(col, row).classList.contains('inactive')) {
             if (col == 1) {
               this.position.x += 2;
             } else if (col == 0) {
-              if (this.getTetriminoGlobalPosition(col + 1, row).classList.contains('inactive')) {
+              if (this.getTetriminoHtmlTagFromGlobalPosition(col + 1, row).classList.contains('inactive')) {
                 this.position.x += 2;
               } else {
                 this.position.x++;
@@ -499,7 +499,7 @@ function Block() {
             } else if (col == 2) {
               this.position.x -= 2;
             } else if (col == 3) {
-              if (this.getTetriminoGlobalPosition(col - 1, row).classList.contains('inactive')) {
+              if (this.getTetriminoHtmlTagFromGlobalPosition(col - 1, row).classList.contains('inactive')) {
                 this.position.x -= 2;
               } else {
                 this.position.x--;

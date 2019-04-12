@@ -244,18 +244,6 @@ function Block() {
     return cells[y + this.position.y][x + this.position.x];
   }
 
-  // テトリミノが今の位置より下に落ちられるかどうかを判定
-  this.judgeFall = () => {
-    for (let row = 0; row < BLOCK_SIZE; row++) {
-      for (let col = 0; col < BLOCK_SIZE; col++) {
-        if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1 && getTargetHtmlTagFromGlobalPosition(col, row + 1).classList.contains('inactive')) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
   // 初期化処理
   const initialize = () => {
     this.keys = Object.keys(blockParts);
@@ -277,6 +265,18 @@ function Block() {
         }
       }
     }
+  }
+
+  // テトリミノが今の位置より下に落ちられるかどうかを判定
+  this.judgeFall = () => {
+    for (let row = 0; row < BLOCK_SIZE; row++) {
+      for (let col = 0; col < BLOCK_SIZE; col++) {
+        if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1 && getTargetHtmlTagFromGlobalPosition(col, row + 1).classList.contains('inactive')) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   // ゲームオーバーであるかどうかを判定

@@ -234,36 +234,14 @@ const makeWall = (cell) => {
 
 //TODO: [SHOULD]プロトタイプをやめたい。
 function Block() {
-  this.keys = Object.keys(blockParts);
-  this.position = { x: START_X_POSITION, y: START_Y_POSITION };
-  this.angle = MINIMUM_ANGLE;
   //現在位置のHTMLタグを入手
   const getTargetHtmlTag = (x, y) => {
     return cells[y][x];
-  }
-  const initialize = () => {
-    this.position = { x: START_X_POSITION, y: START_Y_POSITION };
-    this.tetriminoType = this.keys[Math.floor(Math.random() * (this.keys.length))];
-    this.tetriminoPatterns = blockParts[this.tetriminoType];
-    this.class = this.tetriminoPatterns.class
-    this.tetrimino = this.tetriminoPatterns.pattern[this.angle];
   }
 
   // ステージ全体の中でテトリミノがある位置の座標を取得
   const getTargetHtmlTagFromGlobalPosition = (x, y) => {
     return cells[y + this.position.y][x + this.position.x];
-  }
-
-  //テトリミノを生成
-  this.generate = () => {
-    initialize();
-    for (let row = 0; row < BLOCK_SIZE; row++) {
-      for (let col = 0; col < BLOCK_SIZE; col++) {
-        if (this.tetrimino[row][col]) {
-          getTargetHtmlTagFromGlobalPosition(col, row).classList.add(this.class);
-        }
-      }
-    }
   }
 
   // テトリミノが今の位置より下に落ちられるかどうかを判定
@@ -276,6 +254,29 @@ function Block() {
       }
     }
     return true;
+  }
+
+  // 初期化処理
+  const initialize = () => {
+    this.keys = Object.keys(blockParts);
+    this.angle = MINIMUM_ANGLE;
+    this.position = { x: START_X_POSITION, y: START_Y_POSITION };
+    this.tetriminoType = this.keys[Math.floor(Math.random() * (this.keys.length))];
+    this.tetriminoPatterns = blockParts[this.tetriminoType];
+    this.class = this.tetriminoPatterns.class
+    this.tetrimino = this.tetriminoPatterns.pattern[this.angle];
+  }
+
+  //テトリミノを生成
+  this.generate = () => {
+    initialize();
+    for (let row = 0; row < BLOCK_SIZE; row++) {
+      for (let col = 0; col < BLOCK_SIZE; col++) {
+        if (this.tetrimino[row][col]) {
+          getTargetHtmlTagFromGlobalPosition(col, row).classList.add(this.class);
+        }
+      }
+    }
   }
 
   // ゲームオーバーであるかどうかを判定

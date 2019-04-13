@@ -232,7 +232,6 @@ const makeWall = (cell) => {
   }
 }
 
-//TODO: [SHOULD]プロトタイプをやめたい。
 function Block() {
   //現在位置のHTMLタグを入手
   const getTargetHtmlTag = (x, y) => {
@@ -331,7 +330,6 @@ function Block() {
           continue;
         }
         if (!getTargetHtmlTagFromGlobalPosition(col, row).classList.contains('inactive', this.class)) {
-          console.log(row + this.position.y, col + this.position.x);
           getTargetHtmlTagFromGlobalPosition(col, row).classList.remove(this.class);
         }
       }
@@ -456,7 +454,6 @@ function Block() {
     }
   }
 
-  // TODO: [WANT]マジックナンバーを消す
   // 回転したときに床にぶつかる場合は上にあげる
   const avoidFloor = () => {
     for (let row = 0; row < BLOCK_SIZE; row++) {
@@ -481,12 +478,10 @@ function Block() {
     return false;
   }
 
-  // TODO: [WANT]ifのネストが深い。やっていることがわかりにくい。リファクタ必須。
   // 回転したときに壁にぶつかる場合はずらして回転させる判定
   const avoidWall = () => {
     for (let row = 0; row < BLOCK_SIZE; row++) {
       for (let col = 0; col < BLOCK_SIZE; col++) {
-        console.log(col, row, row + this.position.y, col + this.position.x);
         if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1) {
           if (getTargetHtmlTagFromGlobalPosition(col, row).classList.contains('inactive')) {
             if (col == 1) {
@@ -545,7 +540,7 @@ document.addEventListener('DOMContentLoaded',
       isFallingFlag = true;
       if (tetrimino.judgeGameOver()) {
         clearInterval(restart);
-        alert('GameOver');//TODO: [WANT]ゲームオーバー画面を作成したい。
+        alert('GameOver');
         return;
       }
     }

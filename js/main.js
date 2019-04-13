@@ -424,20 +424,35 @@ function Block() {
   }
 
   // FとAのキーボードを押すとそれぞれ左右に回転する
-  this.rotate = (direction) => {
+  this.rotateLeft = () => {
     clear();
     const currentAngle = this.angle;
-    if (direction == 'left') {
-      this.angle++;
-      if (this.angle > MAX_ANGLE) {
-        this.angle = MINIMUM_ANGLE;
+    this.angle++;
+    if (this.angle > MAX_ANGLE) {
+      this.angle = MINIMUM_ANGLE;
+    }
+    let avoidCount = 0;
+    if (avoidWall()) {
+      avoidCount++;
+      if (avoidWall()) {
+        avoidCount++;
       }
     }
-    if (direction == 'right') {
-      this.angle--;
-      if (this.angle < MINIMUM_ANGLE) {
-        this.angle = MAX_ANGLE;
-      }
+    if (avoidFloor()) {
+      avoidCount++;
+    }
+    if (avoidCount >= 2) {
+      this.angle = currentAngle;
+    }
+  }
+
+  // FとAのキーボードを押すとそれぞれ左右に回転する
+  this.rotateRight = () => {
+    clear();
+    const currentAngle = this.angle;
+    this.angle--;
+    if (this.angle < MINIMUM_ANGLE) {
+      this.angle = MAX_ANGLE;
     }
     let avoidCount = 0;
     if (avoidWall()) {
@@ -559,10 +574,10 @@ document.addEventListener('DOMContentLoaded',
             tetrimino.down();
             break
           case "KeyF":
-            tetrimino.rotate('right');
+            tetrimino.rotateRight();
             break;
           case "KeyA":
-            tetrimino.rotate('left');
+            tetrimino.rotateLeft();
             break;
         }
       }

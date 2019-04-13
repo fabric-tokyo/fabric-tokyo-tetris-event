@@ -42,168 +42,13 @@ const blockParts = {
         [1, 1, 1, 1],
         [0, 0, 0, 0]
       ]
-
-    ]
-  },
-  tetriminoO: {
-    class: "tetrimino-o",
-    pattern: [
-      [
-        [0, 1, 1, 0],
-        [0, 1, 1, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
-      ],
-      [
-        [0, 1, 1, 0],
-        [0, 1, 1, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
-      ],
-      [
-        [0, 1, 1, 0],
-        [0, 1, 1, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
-      ],
-      [
-        [0, 1, 1, 0],
-        [0, 1, 1, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0],
-      ]
-    ]
-  },
-  tetriminoT: {
-    class: "tetrimino-t",
-    pattern: [
-      [
-        [0, 1, 0, 0],
-        [1, 1, 1, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0]
-      ],
-      [
-        [0, 1, 0, 0],
-        [1, 1, 0, 0],
-        [0, 1, 0, 0],
-        [0, 0, 0, 0]
-      ],
-      [
-        [0, 0, 0, 0],
-        [1, 1, 1, 0],
-        [0, 1, 0, 0],
-        [0, 0, 0, 0]
-      ],
-      [
-        [0, 1, 0, 0],
-        [0, 1, 1, 0],
-        [0, 1, 0, 0],
-        [0, 0, 0, 0]
-      ]
-    ]
-  },
-  tetriminoS: {
-    class: "tetrimino-z",
-    pattern: [
-      [
-        [1, 1, 0, 0],
-        [0, 1, 1, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0]
-      ],
-      [
-        [0, 1, 0, 0],
-        [1, 1, 0, 0],
-        [1, 0, 0, 0],
-        [0, 0, 0, 0]
-      ],
-      [
-        [0, 0, 0, 0],
-        [1, 1, 0, 0],
-        [0, 1, 1, 0],
-        [0, 0, 0, 0]
-      ],
-      [
-        [0, 1, 0, 0],
-        [1, 1, 0, 0],
-        [1, 0, 0, 0],
-        [0, 0, 0, 0]
-      ]
-    ]
-  },
-  tetriminoJ: {
-    class: "tetrimino-j",
-    pattern: [
-      [
-        [0, 0, 1, 0],
-        [1, 1, 1, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0]
-      ],
-      [
-        [1, 1, 0, 0],
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-        [0, 0, 0, 0]
-      ],
-      [
-        [0, 0, 0, 0],
-        [1, 1, 1, 0],
-        [1, 0, 0, 0],
-        [0, 0, 0, 0]
-      ],
-      [
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-        [0, 1, 1, 0],
-        [0, 0, 0, 0]
-      ]
-    ]
-  },
-  tetriminoL: {
-    class: "tetrimino-l",
-    pattern: [
-      [
-        [1, 0, 0, 0],
-        [1, 1, 1, 0],
-        [0, 0, 0, 0],
-        [0, 0, 0, 0]
-      ],
-      [
-        [0, 1, 0, 0],
-        [0, 1, 0, 0],
-        [1, 1, 0, 0],
-        [0, 0, 0, 0]
-      ],
-      [
-        [0, 0, 0, 0],
-        [1, 1, 1, 0],
-        [0, 0, 1, 0],
-        [0, 0, 0, 0]
-      ],
-      [
-        [1, 1, 0, 0],
-        [1, 0, 0, 0],
-        [1, 0, 0, 0],
-        [0, 0, 0, 0]
-      ],
     ]
   }
-
 }
 
 // テトリスのステージを作成
 const makeStage = () => {
-  let table = "";
-  for (let row = 0; row < ROWS; row++) {
-    table = table + '<tr>';
-    for (let col = 0; col < COLUMNS; col++) {
-      table = table + '<td/>';
-    }
-    table = table + '</tr>';
-  }
-  return table;
+  //①
 }
 
 // テトリスのステージを２次元配列に格納する
@@ -257,107 +102,32 @@ function Block() {
   //テトリミノを生成
   this.generate = () => {
     initialize();
-    for (let row = 0; row < BLOCK_SIZE; row++) {
-      for (let col = 0; col < BLOCK_SIZE; col++) {
-        if (this.tetrimino[row][col]) {
-          getTargetHtmlTagFromGlobalPosition(col, row).classList.add(this.class);
-        }
-      }
-    }
+    //②
   }
 
   // テトリミノが今の位置より下に落ちられるかどうかを判定
   this.judgeFall = () => {
-    for (let row = 0; row < BLOCK_SIZE; row++) {
-      for (let col = 0; col < BLOCK_SIZE; col++) {
-        if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1 && getTargetHtmlTagFromGlobalPosition(col, row + 1).classList.contains('inactive')) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
-  // ゲームオーバーであるかどうかを判定
-  this.judgeGameOver = () => {
-    for (let col = 0; col < BLOCK_SIZE; col++) {
-      if (this.tetrimino[START_Y_POSITION][col] == 1 && getTargetHtmlTagFromGlobalPosition(col, START_Y_POSITION).classList.contains('inactive')) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  // テトリミノが一列揃ったときに列を消去する判定
-  const judgeErase = (globalY) => {
-    let count = 0;
-    for (let col = 0; col < COLUMNS - 1; col++) {
-      if (getTargetHtmlTag(col, globalY).classList.contains('inactive')) {
-        count++
-      }
-      if (count == COLUMNS - 1) {
-        this.eraseAndShift(globalY);
-      }
-    }
-  }
-
-  // テトリミノを一列消去して一段下げる
-  this.eraseAndShift = (globalY) => {
-    for (let col = 1; col < COLUMNS - 1; col++) {
-      getTargetHtmlTag(col, globalY).className = "";
-    }
-    //一段下げる
-    for (let downRow = globalY - 1; downRow > 0; downRow--) {
-      for (let col = 1; col < COLUMNS - 1; col++) {
-        getTargetHtmlTag(col, downRow + 1).className = getTargetHtmlTag(col, downRow).className;
-        getTargetHtmlTag(col, downRow).className = "";
-      }
-    }
-  }
-
-  // 落下処理
-  this.fall = () => {
-    clear();
-    this.position.y++;
-    appear();
+    //③
   }
 
   // 移動するために表示されたブロックをクリア
   const clear = () => {
-    for (let row = 0; row < BLOCK_SIZE; row++) {
-      for (let col = 0; col < BLOCK_SIZE; col++) {
-        if (col + this.position.x + 1 > COLUMNS || col + this.position.x - 1 < 0 || this.position.y < 0) {
-          continue;
-        }
-        if (!getTargetHtmlTagFromGlobalPosition(col, row).classList.contains('inactive', this.class)) {
-          getTargetHtmlTagFromGlobalPosition(col, row).classList.remove(this.class);
-        }
-      }
-    }
+    //③
   }
 
   // 移動のために消えたテトリミノを再表示
   const appear = () => {
-    for (let row = 0; row < BLOCK_SIZE; row++) {
-      for (let col = 0; col < BLOCK_SIZE; col++) {
-        if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1) {
-          getTargetHtmlTagFromGlobalPosition(col, row).classList.add(this.class);
-        }
-      }
-    }
+    //③
+  }
+
+  // 落下処理
+  this.fall = () => {
+    //③
   }
 
   // テトリミノの位置を固定する
   this.fix = () => {
-    for (let row = 0; row < BLOCK_SIZE; row++) {
-      for (let col = 0; col < BLOCK_SIZE; col++) {
-        if (this.tetriminoPatterns.pattern[this.angle][row][col]) {
-          getTargetHtmlTagFromGlobalPosition(col, row).classList.add(this.class, 'inactive');
-          isFallingFlag = false;
-          judgeErase(row + this.position.y);
-        }
-      }
-    }
+    // ④
   }
 
   // 矢印の下を押したときに下がるスピードが上がる
@@ -383,35 +153,17 @@ function Block() {
 
   // 右キーを押したときにスライド
   this.moveRight = () => {
-    if (judgeRight()) {
-      clear();
-      this.position.x++;
-      appear();
-    }
+    // ⑤
   }
 
   // 右方向のに移動しても良いか判定
   const judgeRight = () => {
-    for (let row = 0; row < BLOCK_SIZE; row++) {
-      for (let col = 0; col < BLOCK_SIZE; col++) {
-        if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1 && getTargetHtmlTagFromGlobalPosition(col + 1, row).classList.contains('inactive')) {
-          return false;
-        }
-      }
-    }
-    return true;
+    // ⑤
   }
 
   //  左方向に移動しても良いか判定
   const judgeLeft = () => {
-    for (let row = 0; row < BLOCK_SIZE; row++) {
-      for (let col = 0; col < BLOCK_SIZE; col++) {
-        if (this.tetriminoPatterns.pattern[this.angle][row][col] == 1 && getTargetHtmlTagFromGlobalPosition(col - 1, row).classList.contains('inactive')) {
-          return false;
-        }
-      }
-    }
-    return true;
+    //⑤
   }
 
   // 左キーボードが押されたら方向にスライドする
@@ -421,6 +173,26 @@ function Block() {
       this.position.x--;
       appear();
     }
+  }
+
+  // ゲームオーバーであるかどうかを判定
+  this.judgeGameOver = () => {
+    for (let col = 0; col < BLOCK_SIZE; col++) {
+      if (this.tetrimino[START_Y_POSITION][col] == 1 && getTargetHtmlTagFromGlobalPosition(col, START_Y_POSITION).classList.contains('inactive')) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // テトリミノが一列揃ったときに列を消去する判定
+  const judgeErase = (globalY) => {
+    //⑥
+  }
+
+  // テトリミノを一列消去して一段下げる
+  this.eraseAndShift = (globalY) => {
+    //⑥
   }
 
   // FとAのキーボードを押すとそれぞれ左右に回転する
@@ -531,35 +303,26 @@ document.addEventListener('DOMContentLoaded',
 
     document.getElementById('board').innerHTML = makeStage();
 
-    const stageArray = storeStageInTwoDimensionalArray();
-    makeWall(stageArray);
+    // const stageArray = storeStageInTwoDimensionalArray();
+    // makeWall(stageArray);
 
     const tetrimino = new Block();
     const fallProcess = function () {
-      tetrimino.generate();
-      const fallLoop = function () {
-        if (tetrimino.judgeFall()) {
-          tetrimino.fall();
-        } else {
-          tetrimino.fix();
-          clearInterval(fallId);
-        }
-      }
-      const fallId = setInterval(fallLoop, FALL_INTERVAL);;
+      // ③
     }
     fallProcess();
-    const loop = function () {
-      if (!isFallingFlag) {
-        fallProcess();
-      }
-      isFallingFlag = true;
-      if (tetrimino.judgeGameOver()) {
-        clearInterval(restart);
-        alert('GameOver');
-        return;
-      }
-    }
-    const restart = setInterval(loop, RESTART_INTERVAL);
+    // const loop = function () {
+    //   if (!isFallingFlag) {
+    //     fallProcess();
+    //   }
+    //   isFallingFlag = true;
+    //   if (tetrimino.judgeGameOver()) {
+    //     clearInterval(restart);
+    //     alert('GameOver');
+    //     return;
+    //   }
+    // }
+    // const restart = setInterval(loop, RESTART_INTERVAL);
 
     document.onkeydown = function (downedKey) {
       if (isFallingFlag == true) {
